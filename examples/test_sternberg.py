@@ -11,6 +11,8 @@ from __future__ import print_function
 
 import sys
 import os
+import pathlib
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 import numpy as np
 import matplotlib.pyplot as plt
 from pycog import Model
@@ -34,12 +36,14 @@ def visualize_trial(trial, title="Sternberg Trial"):
         dt = trial['info']['dt']
         y_max = trial['inputs'].shape[1]
         
-        for name, (start, end) in epochs.items():
-            if name != 'T':
-                start_idx = int(start / dt)
-                end_idx = int(end / dt)
-                ax.axvline(start_idx, color='red', linestyle='--', alpha=0.5)
-                ax.text(start_idx, y_max * 0.95, name, rotation=90, 
+        for name, val in epochs.items():
+            if name == 'T':
+                continue
+            start, end = val
+            start_idx = int(start / dt)
+            end_idx = int(end / dt)
+            ax.axvline(start_idx, color='red', linestyle='--', alpha=0.5)
+            ax.text(start_idx, y_max * 0.95, name, rotation=90, 
                        verticalalignment='top', fontsize=8)
     
     # 目标输出
@@ -87,9 +91,11 @@ def print_trial_info(trial):
         print(f"Delay Duration: {info['delay_duration']} ms")
     
     print(f"\nTiming (ms):")
-    for name, (start, end) in sorted(info['epochs'].items()):
-        if name != 'T':
-            print(f"  {name:15s}: {start:6d} - {end:6d} ({end-start:4d} ms)")
+    for name, val in sorted(info['epochs'].items()):
+        if name == 'T':
+            continue
+        start, end = val
+        print(f"  {name:15s}: {start:6d} - {end:6d} ({end-start:4d} ms)")
     print(f"  {'Total':15s}: {info['epochs']['T']} ms")
     
     print(f"\nInput shape: {trial['inputs'].shape}")

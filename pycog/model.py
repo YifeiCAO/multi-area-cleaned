@@ -3,7 +3,7 @@
 """
 from __future__ import absolute_import
 
-import imp
+import importlib.util
 import inspect
 import os
 import sys
@@ -59,8 +59,11 @@ class Model(object):
 
         if modelfile is not None:
             try:
-                # this loads all the variables of the model as well as the generate_trial function to self.m!  It acts like a struct at that point.  self.m.Nin, self.m.N, etc.
-                self.m = imp.load_source('model', modelfile)
+                # Load the model file as a module using importlib (Py3 compatible)
+                spec = importlib.util.spec_from_file_location('model', modelfile)
+                module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(module)
+                self.m = module
             except IOError:
                 print("[ {}.Model ] Couldn't load model file {}".format(THIS, modelfile))
                 sys.exit(1)
@@ -74,11 +77,17 @@ class Model(object):
         # generate_trial : existence
         try:
             f = self.m.generate_trial
-            args = inspect.getargspec(f).args
+            try:
+                args = list(inspect.signature(f).parameters.keys())
+            except Exception:
+                args = inspect.getfullargspec(f).args
         except AttributeError:
             try:
                 f = self.m.task.generate_trial
-                args = inspect.getargspec(f).args[1:]
+                try:
+                    args = list(inspect.signature(f).parameters.keys())[1:]
+                except Exception:
+                    args = inspect.getfullargspec(f).args[1:]
             except AttributeError:
                 print("[ {}.Model ] You need to define a function that returns trials."
                       .format(THIS))
