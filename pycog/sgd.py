@@ -11,7 +11,7 @@ with the modifications described in
 from __future__ import absolute_import
 from __future__ import division
 
-import cPickle as pickle
+import pickle
 import datetime
 import os
 import sys
@@ -20,6 +20,15 @@ import numpy as np
 
 import theano
 import theano.tensor as T
+try:
+    # Theano 0.9
+    from theano.scan_module.scan_op import Scan as TheanoScanOp
+except Exception:
+    try:
+        # Theano-PyMC
+        from theano.scan.op import Scan as TheanoScanOp
+    except Exception:
+        TheanoScanOp = None
 
 from .      import theanotools
 from .rnn   import RNN
@@ -144,7 +153,8 @@ class SGD(object):
         # scan_node.op.n_seqs is the number of sequences in the scan
         # init_x is the initial value of x at all time points, including x0
         scan_node = x.owner.inputs[0].owner
-        assert isinstance(scan_node.op, theano.scan_module.scan_op.Scan)
+        if TheanoScanOp is not None:
+            assert isinstance(scan_node.op, TheanoScanOp)
         npos   = scan_node.op.n_seqs + 1
         init_x = scan_node.inputs[npos]
         g_x,   = theanotools.grad(costs[0], [init_x])
@@ -421,7 +431,7 @@ class SGD(object):
         tr_gnorm    = None
         try:
             tstart = datetime.datetime.now()
-            for iter in xrange(first_iter, 1+self.p['max_iter']):
+            for iter in range(first_iter, 1+self.p['max_iter']):
                 if iter % checkfreq == 1:
                     #---------------------------------------------------------------------
                     # Timestamp

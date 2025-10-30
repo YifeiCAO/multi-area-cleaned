@@ -211,7 +211,7 @@ def performance_cb_simple(trials, z):
         #if np.abs(choices[i] - choice) < 0.3:
         #    num_correct += 1
         if np.sign(choices[i]) == choice:
-			num_correct += 1
+            num_correct += 1
 
 
         num_trials += 1 
@@ -239,7 +239,7 @@ def performance_cb_simple_threshold(trials, z):
         #if np.abs(choices[i] - choice) < 0.3:
         #    num_correct += 1
         if np.sign(choices[i]) == choice & np.abs(choices[i]) > threshold:
-			num_correct += 1
+            num_correct += 1
 
 
         num_trials += 1 
@@ -347,13 +347,13 @@ def performance_cora_r2(trials, z):
     ydec = []
 
     for i in np.arange(len(trials)):
-		# iterate trial by trial
+        # iterate trial by trial
 
         if 'cond' in trials[i]['info']:
             # Trial length
             T_i = trials[i]['info']['epochs']['T']
     
-    		# decoded positions and velocities
+            # decoded positions and velocities
             z_dec = z[:T_i // dt, i, :]
     
             # true positions and velocities.
@@ -392,13 +392,13 @@ def performance_cora_r2_back(trials, z):
     ydec = []
 
     for i in np.arange(len(trials)):
-		# iterate trial by trial
+        # iterate trial by trial
 
         if 'cond' in trials[i]['info']:
             # Trial length
             T_i = trials[i]['info']['epochs']['T']
     
-    		# decoded positions and velocities
+            # decoded positions and velocities
             z_dec = z[:T_i // dt, i, :]
     
             # true positions and velocities.

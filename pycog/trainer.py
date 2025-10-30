@@ -278,7 +278,7 @@ class Trainer(object):
     # Convert to connectivity matrices
     for k in ['Cin', 'Crec', 'Cout']:
       if self.p[k] is not None and not isinstance(self.p[k], Connectivity):
-        print 'Checking connectivity of {}'.format(k)
+        print('Checking connectivity of {}'.format(k))
         self.p[k] = Connectivity(self.p[k])
 
   #/////////////////////////////////////////////////////////////////////////////////////
